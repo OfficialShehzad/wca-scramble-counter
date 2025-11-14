@@ -1,5 +1,5 @@
-// app/api/auth/callback/route.ts
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "No code received" }, { status: 400 });
   }
 
+  // Exchange code for token
   const tokenRes = await fetch(
     "https://www.worldcubeassociation.org/oauth/token",
     {
@@ -27,22 +28,19 @@ export async function GET(request: Request) {
   const tokenData = await tokenRes.json();
 
   if (!tokenRes.ok) {
-    return NextResponse.json({ error: tokenData }, { status: 500 });
+    return NextResponse.json(tokenData, { status: 500 });
   }
 
-  // Fetch user profile
-  const userRes = await fetch(
-    "https://www.worldcubeassociation.org/api/v0/me",
-    {
-      headers: { Authorization: `Bearer ${tokenData.access_token}` },
-    }
-  );
+  const accessToken = tokenData.access_token;
 
-  const userData = await userRes.json();
-
-  return NextResponse.json({
-    success: true,
-    user: userData,
-    tokens: tokenData,
+  // Set secure HTTP-only cookie
+  const response = NextResponse.redirect("http://localhost:3000/competitions");
+  response.cookies.set("wca_token", accessToken, {
+    httpOnly: true,
+    secure: false,        // set true in production HTTPS
+    maxAge: 60 * 60 * 24, // 1 day
+    path: "/",
   });
+
+  return response;
 }

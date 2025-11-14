@@ -18,7 +18,7 @@ export default function Home() {
     "https://www.worldcubeassociation.org/oauth/authorize" +
     `?client_id=${encodeURIComponent(clientId)}` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-    `&response_type=code&scope=public`;
+    `&response_type=code&scope=${encodeURIComponent("public manage_competitions")}`;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
