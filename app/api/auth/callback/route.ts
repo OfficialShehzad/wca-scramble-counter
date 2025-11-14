@@ -18,9 +18,9 @@ export async function GET(request: Request) {
       body: JSON.stringify({
         grant_type: "authorization_code",
         code,
-        client_id: process.env.WCA_CLIENT_ID,
-        client_secret: process.env.WCA_CLIENT_SECRET,
-        redirect_uri: process.env.WCA_REDIRECT_URI,
+        client_id: process.env.NEXT_PUBLIC_WCA_CLIENT_ID,
+        client_secret: process.env.NEXT_PUBLIC_WCA_CLIENT_SECRET,
+        redirect_uri: process.env.NEXT_PUBLIC_WCA_REDIRECT_URI,
       }),
     }
   );
@@ -34,9 +34,9 @@ export async function GET(request: Request) {
   const accessToken = tokenData.access_token;
 
   // Set secure HTTP-only cookie
-  const response = NextResponse.redirect("http://localhost:3000/competitions");
+  const response = NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/competitions`);
   response.cookies.set("wca_token", accessToken, {
-    httpOnly: true,
+    httpOnly: false,
     secure: false,        // set true in production HTTPS
     maxAge: 60 * 60 * 24, // 1 day
     path: "/",
