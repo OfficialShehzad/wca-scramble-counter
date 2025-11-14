@@ -165,72 +165,85 @@ export default function CompetitionDetail() {
         >
           Go back
         </Link>
-      <div className="flex justify-between items-center mb-6 mt-3">
+      <div className="flex justify-between items-center mb-3 mt-3">
         <h1 className="text-3xl font-bold">{id}</h1>
-
+        </div>
         <button
-          className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700"
+          className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 mb-3"
           onClick={copyScrambleData}
         >
           Copy Scramble Data
         </button>
-      </div>
 
       <h2 className="text-xl font-semibold mb-4">Schedule</h2>
 
       <div className="space-y-4">
-        {Object.entries(days).map(([day, events]: any) => (
+        {Object.entries(days).map(([day, events]: any, index: number) => (
           <div key={day} className="border rounded-lg overflow-hidden bg-white">
             {/* Day Collapsible Button */}
             <button
               onClick={() => toggleDay(day)}
               className="w-full text-left p-4 bg-gray-100 hover:bg-gray-200 font-bold"
             >
-              {day} {openDays[day] ? "▲" : "▼"}
+              {day} (Day {index + 1}) {openDays[day] ? "▲" : "▼"}
             </button>
 
             {openDays[day] && (
               <div className="p-4 space-y-3">
-                {events.filter((ev: any) => ev.name.includes('Round')).map((ev: any) => (
-                  <div
-                    key={ev.name}
-                    className="p-3 border rounded bg-gray-50 flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-semibold">{ev.name}</p>
-                      <p className="text-sm text-gray-600">
-                        {ev.startTime} → {ev.endTime}
-                      </p>
+                {events
+                  .filter((ev: any) => ev.name.includes("Round"))
+                  .map((ev: any) => {
+                    const start = new Date(ev.startTime).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    });
 
-                      {/* Show scrambles */}
-                      {scrambles[ev.name]?.length > 0 && (
-                        <p className="mt-1 text-sm text-green-700">
-                          Sets: {scrambles[ev.name].join(", ")}
-                        </p>
-                      )}
-                    </div>
+                    const end = new Date(ev.endTime).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    });
 
-                    {/* + / - Buttons */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => removeScramble(ev.name)}
-                        className="px-3 py-1 bg-red-500 text-white rounded disabled:bg-gray-300"
-                        disabled={!scrambles[ev.name]?.length}
+                    return (
+                      <div
+                        key={ev.name}
+                        className="p-3 border rounded bg-gray-50 flex justify-between items-center"
                       >
-                        −
-                      </button>
+                        <div>
+                          <p className="font-semibold">{ev.name}</p>
 
-                      <button
-                        onClick={() => addScramble(ev.name)}
-                        className="px-3 py-1 bg-green-600 text-white rounded"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                          <p className="text-sm text-gray-600">
+                            {start} → {end}
+                          </p>
+
+                          {scrambles[ev.name]?.length > 0 && (
+                            <p className="mt-1 text-sm text-green-700">
+                              Sets: {scrambles[ev.name].join(", ")}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => removeScramble(ev.name)}
+                            className="px-3 py-1 bg-red-500 text-white rounded disabled:bg-gray-300"
+                            disabled={!scrambles[ev.name]?.length}
+                          >
+                            −
+                          </button>
+
+                          <button
+                            onClick={() => addScramble(ev.name)}
+                            className="px-3 py-1 bg-green-600 text-white rounded"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             )}
+
           </div>
         ))}
       </div>
