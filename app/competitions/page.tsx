@@ -23,22 +23,24 @@ export default async function Competitions() {
 
     const data = await res.json();
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // normalize
+  const cutoff = new Date();
+  cutoff.setHours(0, 0, 0, 0);   // normalize to start of today
+  cutoff.setDate(cutoff.getDate() - 3); // go back 3 days
 
-    // Keep only competitions that start today or later
-    const competitions = data.filter((c: any) => {
-        const start = new Date(c.start_date);
-        return start >= today;
-    });
+  // Keep only competitions that started within last 3 days or later
+  const competitions = data.filter((c: any) => {
+    const start = new Date(c.start_date);
+    return start >= cutoff;
+  });
 
-
-  console.log('competitions: ', competitions)
 
   return (
-    <div className="min-h-screen bg-zinc-100 p-10">
+    <div className="min-h-screen bg-slate-950 p-10">
       <div className="flex justify-between mb-8">
-        <h1 className="text-2xl font-bold">My Competitions</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-white">My Competitions</h1>
+          <p className="text-xs text-white">Please note that the scramble set data is only stored locally on your current device and will not persist if you login to to other devices.</p>
+        </div>
 
         <form action="/api/auth/logout" method="POST">
           <button
@@ -60,11 +62,11 @@ export default async function Competitions() {
             key={c.id}
             className="p-4 bg-white rounded-lg shadow border"
           >
-            <h2 className="font-semibold text-lg">{c.name}</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="font-semibold text-lg text-black">{c.name}</h2>
+            <p className="text-sm text-black">
               {c.city}, {c.country_iso2}
             </p>
-            <p className="text-sm">
+            <p className="text-sm text-black">
               {c.start_date} → {c.end_date}
             </p>
             <a

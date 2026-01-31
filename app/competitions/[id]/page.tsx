@@ -18,14 +18,14 @@ export default function CompetitionDetail() {
 
   // Load scrambles
   useEffect(() => {
-    const saved = localStorage.getItem("scramble_sets");
+    const saved = localStorage.getItem(`scramble_sets_${id}`);
     if (saved) setScrambles(JSON.parse(saved));
   }, []);
 
   // Save scrambles
   useEffect(() => {
-    localStorage.setItem("scramble_sets", JSON.stringify(scrambles));
-  }, [scrambles]);
+    localStorage.setItem(`scramble_sets_${id}`, JSON.stringify(scrambles));
+  }, [scrambles, id]);
 
   useEffect(() => {
     async function load() {
@@ -150,9 +150,25 @@ export default function CompetitionDetail() {
     setOpenDays((prev) => ({ ...prev, [day]: !prev[day] }));
 
   const copyScrambleData = () => {
-    navigator.clipboard.writeText(JSON.stringify(scrambles, null, 2));
+    const tempScrambles = scrambles;
+
+    const transformedScrambles = Object.fromEntries(
+      Object.entries(tempScrambles).map(([key, arr]) => [
+        key,
+        {
+          sets: arr,
+          count: (arr as string[]).length
+        }
+      ])
+    );
+
+    navigator.clipboard.writeText(JSON.stringify(transformedScrambles, null, 2));
     alert("Scramble data copied!");
   };
+
+  const clearScrambleData = () => {
+    setScrambles({});
+  }
 
   // ----------------------------
   // UI
@@ -164,16 +180,25 @@ export default function CompetitionDetail() {
           href={'/competitions'}
         >
           Go back
-        </Link>
-      <div className="flex justify-between items-center mb-3 mt-3">
+      </Link>
+      <div className="mb-3 mt-3">
         <h1 className="text-3xl font-bold">{id}</h1>
-        </div>
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 mb-3"
-          onClick={copyScrambleData}
-        >
-          Copy Scramble Data
-        </button>
+        <p className="text-xs text-white">Please note that the scramble set data is only stored locally on your current device and will not persist if you login to to other devices.</p>
+      </div>
+      <button
+        className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 mb-3 mr-3 disabled:bg-blue-700/40 disabled:text-white/40"
+        onClick={copyScrambleData}
+        disabled={JSON.stringify(scrambles) === '{}'}
+      >
+        Copy Scramble Data
+      </button>
+      <button
+        className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-red-700 mb-3 disabled:bg-red-700/40 disabled:text-white/40"
+        onClick={clearScrambleData}
+        disabled={JSON.stringify(scrambles) === '{}'}
+      >
+        Clear Scramble Data
+      </button>
 
       <h2 className="text-xl font-semibold mb-4">Schedule</h2>
 
@@ -183,7 +208,7 @@ export default function CompetitionDetail() {
             {/* Day Collapsible Button */}
             <button
               onClick={() => toggleDay(day)}
-              className="w-full text-left p-4 bg-gray-100 hover:bg-gray-200 font-bold"
+              className="w-full text-left p-4 bg-white hover:bg-gray-200 text-black font-bold"
             >
               {day} (Day {index + 1}) {openDays[day] ? "▲" : "▼"}
             </button>
@@ -206,12 +231,12 @@ export default function CompetitionDetail() {
                     return (
                       <div
                         key={ev.name}
-                        className="p-3 border rounded bg-gray-50 flex justify-between items-center"
+                        className="p-3 border rounded bg-white text-black flex justify-between items-center"
                       >
                         <div>
-                          <p className="font-semibold">{ev.name}</p>
+                          <p className="font-semibold text-black">{ev.name}</p>
 
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-black">
                             {start} → {end}
                           </p>
 

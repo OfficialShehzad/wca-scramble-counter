@@ -1,6 +1,5 @@
 // app/page.tsx
 import Link from "next/link";
-import React from "react";
 
 export default function Home() {
   // These are available in a server component (page.tsx)
@@ -22,7 +21,7 @@ export default function Home() {
     `&response_type=code&scope=${encodeURIComponent("public manage_competitions")}`;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center bg-black font-sans">
       <Link
         href={loginUrl}
         className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
